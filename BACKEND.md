@@ -437,3 +437,14 @@ STORAGES = {
 # Зачем она нужна? Когда проект будет в проде сервер будет Kubernetes и там статики не собирает Nginx, вот поэтому с whitenoise мы собираем сами.
 
 # Команда python manage.py collectstatic  после запуска не должно быть конфликтов
+
+## Запуск Django с Docker и Nginx
+
+Из корня проекта создайте локальный `.env` на основе `example.env` и запустите контейнеры:
+
+```powershell
+Copy-Item example.env .env
+docker compose up --build
+```
+
+Приложение доступно по адресу `http://localhost`, админка — `http://localhost/admin/`. Django выполняет миграции и сбор статики перед запуском Gunicorn; Nginx раздает `/static/` и `/media/`. Данные SQLite, статика и медиа сохраняются в Docker volumes.

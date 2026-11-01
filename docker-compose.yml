@@ -1,0 +1,37 @@
+services:
+  backend:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      PRODUCTION: "False"
+      DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      SECRET_KEY: ${SECRET_KEY:-local-docker-development-only-change-before-production-0123456789abcdef}
+      DJANGO_SETTINGS_MODULE: core.settings.base
+      SQLITE_PATH: /app/db_data/db.sqlite3
+    expose:
+      - "8000"
+    volumes:
+      - back_static:/app/back_static
+      - back_media:/app/back_media
+      - backend_db:/app/db_data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - back_static:/app/back_static:ro
+      - back_media:/app/back_media:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  back_static:
+  back_media:
+  backend_db:
